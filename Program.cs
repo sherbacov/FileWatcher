@@ -18,21 +18,21 @@ namespace FileWatcher
 
             HostFactory.Run(x =>                                
             {
-                x.Service<FileWatherManager>(s =>                       
+                x.Service<FileWatcherManager>(s =>                       
                 {
-                    s.ConstructUsing(name => new FileWatherManager());
+                    s.ConstructUsing(name => new FileWatcherManager());
                     s.WhenStarted(tc => tc.Start());              
                     s.WhenStopped(tc => tc.Stop());               
                 });
                 x.RunAsLocalSystem();                          
 
                 x.SetDescription("Служба копирования файлов");    
-                x.SetDisplayName("FileWather");                   
-                x.SetServiceName("FileWather");                   
+                x.SetDisplayName("FileWatcher");                   
+                x.SetServiceName("FileWatcher");                   
             });
         }
 
-        public class FileWatherManager
+        public class FileWatcherManager
         {
             private readonly Logger logger = LogManager.GetCurrentClassLogger();
             WindsorContainer container;

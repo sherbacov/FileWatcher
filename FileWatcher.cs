@@ -46,23 +46,6 @@ namespace FileWatcher
         Ignore = 2
     }
 
-    public interface IConfig
-    {
-        string SourceFolder { get; set; }
-
-        string DestFolder { get; set; }
-
-        ErrorMode Mode { get; set; }
-
-        FileExistMode FileExist { get; set; }
-
-        int WaitSecs { get; set; }
-
-        int RetrySec { get; set; }
-
-        bool StartBackupThread { get; set; }
-    }
-
     /// <summary>
     /// Внутренний интерфейс обрабатывающий папку
     /// </summary>
@@ -157,7 +140,7 @@ namespace FileWatcher
                             _log.Info("Остановка резервного потока.");
                             break;
                         }
-
+                        _log.Trace("Обработка цикла резервного потока.");
                         try
                         {
                             foreach (var sourceFolder in _sourceFolders)
@@ -269,7 +252,7 @@ namespace FileWatcher
 
                             if (_config.Mode == ErrorMode.WaitAndRetry)
                             {
-                                while (true)
+                                //while (true)
                                 {
                                     Thread.Sleep(_config.RetrySec);
                                     File.Copy(e.FullPath, destFileName);
