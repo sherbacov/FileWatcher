@@ -1,10 +1,11 @@
 ﻿using System;
-using Castle.MicroKernel.Registration;
-using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
-using Castle.Windsor.Installer;
+using System.ComponentModel;
+using Autofac;
+using Autofac.Configuration;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using Topshelf;
+using IContainer = Autofac.IContainer;
 
 namespace FileWatcher
 {
@@ -34,30 +35,41 @@ namespace FileWatcher
 
         public class FileWatcherManager
         {
-            private readonly Logger logger = LogManager.GetCurrentClassLogger();
-            WindsorContainer container;
+            private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+            ContainerBuilder _builder;
+
+            IContainer container;
 
             public void Start()
             {
-                container = new WindsorContainer(new XmlInterpreter());
+                _builder = new ContainerBuilder();
 
-                // adds and configures all components using WindsorInstallers from executing assembly
-                container.Install(FromAssembly.This());
 
-                container.Register(Component.For<IConfig>().ImplementedBy<Config>().Named("Config"));
-                container.Register(Component.For<IFileWather>().ImplementedBy<FileWatcher>());
-                container.Register(Component.For<IFileSystemWather>().ImplementedBy<InternalFileSystemWather>());
-                container.Register(Component.For<ISourceFolder>().ImplementedBy<SourceFolder>());
+                //_builder.RegisterType<Config>().As<IConfig>();
+                _builder.RegisterType<FileWatcher>().As<IFileWather>();
+                _builder.RegisterType<InternalFileSystemWather>().As<IFileSystemWather>();
+                _builder.RegisterType<SourceFolder>().As<ISourceFolder>().PropertiesAutowired(); ;
+                _builder.RegisterType<SourceFolderManager>().As<ISourceFolderManager>();
 
+
+                // Add the configuration to the ConfigurationBuilder.
+                var configurationBuilder = new ConfigurationBuilder();
+                configurationBuilder.AddXmlFile("FileWatcher.xml");
+
+                // Register the ConfigurationModule with Autofac.
+                var module = new ConfigurationModule(configurationBuilder.Build());
+                _builder.RegisterModule(module);
+               container = _builder.Build();
 
                 var king = container.Resolve<IFileWather>();
+
                 king.StartProcessing();
-                logger.Info("Запуск успешно завершен.");
+                _logger.Info("Запуск успешно завершен.");
             }
 
             public void Stop()
             {
-                logger.Info("Завершение работы.");
+                _logger.Info("Завершение работы.");
 
                 // clean up, application exits
                 container.Dispose();

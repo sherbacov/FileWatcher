@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Autofac;
 using NLog;
 
 namespace FileWatcher
@@ -82,13 +83,60 @@ namespace FileWatcher
 
     public class SourceFolder : ISourceFolder
     {
-        public IFileSystemWather Wather { get; set; }
+        public SourceFolder(IFileSystemWather watсher)
+        {
+            Watсher = watсher;
+        }
+        public IFileSystemWather Watсher { get; set; }
     }
 
 
     public interface ISourceFolder
     {
-        IFileSystemWather Wather { get; set; }
+        IFileSystemWather Watсher { get; set; }
+    }
+
+
+    public interface ISourceFolderManager
+    {
+        void Process(string src, FileSystemEventHandler handler);
+        List<string> Folders { get; }
+    }
+
+
+    public class SourceFolderManager : ISourceFolderManager
+    {
+        public SourceFolderManager(ILifetimeScope container)
+        {
+            _container = container;
+        }
+
+        private readonly List<ISourceFolder> _sourceFolders = new List<ISourceFolder>();
+
+        private readonly Logger _log = LogManager.GetCurrentClassLogger();
+        private readonly ILifetimeScope _container;
+
+        public void Process(string src, FileSystemEventHandler handler)
+        {
+            _sourceFolders.Clear();
+
+            foreach (var folder in src.Split(';'))
+            {
+                _log.Debug("Папка источник: {0}", folder);
+                var sf = _container.Resolve<ISourceFolder>();
+                sf.Watсher.NewFile += handler;
+                sf.Watсher.Folder = folder;
+                _sourceFolders.Add(sf);
+            }
+        }
+
+        public List<string> Folders
+        {
+            get
+            {
+                return _sourceFolders.Select(sf => sf.Watсher.Folder).ToList();
+            }
+        }
     }
 
 
@@ -96,20 +144,14 @@ namespace FileWatcher
     {
         private readonly IConfig _config;
 
-        public FileWatcher(IConfig config, IFileSystemWather wather)
+        private readonly ISourceFolderManager _sourceFolderManager;
+
+        public FileWatcher(IConfig config, ISourceFolderManager sourceFolderManager)
         {
             _config = config;
+            _sourceFolderManager = sourceFolderManager;
 
-            _sourceFolders = new List<SourceFolder>();
-            foreach (var folder in config.SourceFolder.Split(';'))
-            {
-                _log.Debug("Папка источник: {0}", folder);
-                var sf = new SourceFolder();
-                sf.Wather = wather;
-                sf.Wather.NewFile += new FileSystemEventHandler(WatcherOnChanged);
-                sf.Wather.Folder = folder;
-                _sourceFolders.Add(sf);
-            }
+            sourceFolderManager.Process(config.SourceFolder, WatcherOnChanged);
 
             _destFolders = new List<string>();
             foreach (var dstfolder in config.DestFolder.Split(';'))
@@ -118,8 +160,6 @@ namespace FileWatcher
                 _destFolders.Add(dstfolder);
             }
         }
-
-        private readonly List<SourceFolder> _sourceFolders;
 
         private readonly List<string> _destFolders;
 
@@ -130,7 +170,7 @@ namespace FileWatcher
         {
             if (_config.StartBackupThread)
             {
-                backupThread = new Thread((ParameterizedThreadStart) (o =>
+                backupThread = new Thread(o =>
                 {
                     _log.Info("Запуск резервного потока.");
                     while (true)
@@ -143,9 +183,9 @@ namespace FileWatcher
                         _log.Trace("Обработка цикла резервного потока.");
                         try
                         {
-                            foreach (var sourceFolder in _sourceFolders)
+                            foreach (var sourceFolder in _sourceFolderManager.Folders)
                             {
-                                foreach (var file in new DirectoryInfo(sourceFolder.Wather.Folder).GetFiles("*.*"))
+                                foreach (var file in new DirectoryInfo(sourceFolder).GetFiles("*.*"))
                                 {
                                     _log.Debug("Передача файла из резервного потока: {0}", file.Name);
                                     WatcherOnChanged((object) this, new FileSystemEventArgs(WatcherChangeTypes.Changed, file.Directory.FullName, file.Name));
@@ -156,9 +196,9 @@ namespace FileWatcher
                         {
                             _log.Error(ex);
                         }
-                        Thread.Sleep(2000);
+                        Thread.Sleep(5000);
                     }
-                }));
+                });
                 try
                 {
                     backupThread.Start();

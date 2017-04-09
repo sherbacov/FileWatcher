@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<autofac defaultAssembly="FileWatcher">
+  <components name="0">
+    <type>FileWatcher.Config</type>
+    <services name="0" type="FileWatcher.IConfig" />
+    <injectProperties>true</injectProperties>
+    <properties>
+      <SourceFolder>e:\test2\src;e:\test2\src2</SourceFolder>
+      <DestFolder>e:\test2\dst;e:\test2\dst</DestFolder>
+      <Mode>1</Mode> <!-- режим обработки ошибок. см. ниже -->
+      <FileExist>1</FileExist> <!-- режим обработки файлов назначения. см. ниже -->
+      <RetrySec>30</RetrySec>
+      <WaitSecs>5</WaitSecs> <!-- время ожидания разблокировки исходного файла -->
+      <StartBackupThread>True</StartBackupThread>
+    </properties>
+  </components>  
+</autofac>
