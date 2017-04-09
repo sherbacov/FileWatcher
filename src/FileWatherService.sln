@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWatcher", "FileWatcher.csproj", "{D0F3F446-3B57-4817-A3C7-EBB235F70049}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWatcher", "FileWatcher\FileWatcher.csproj", "{D0F3F446-3B57-4817-A3C7-EBB235F70049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWatcherTests", "..\FileWatcherTests\FileWatcherTests.csproj", "{43A0B40C-5DFE-4E57-8E8B-58B52A69443D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWatcherTests", "FileWatcherTests\FileWatcherTests.csproj", "{43A0B40C-5DFE-4E57-8E8B-58B52A69443D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
