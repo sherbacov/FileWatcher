@@ -100,7 +100,7 @@ namespace FileWatcher
     public interface ISourceFolderManager
     {
         void Process(string src, FileSystemEventHandler handler);
-        List<string> Folders { get; }
+        IEnumerable<string> Folders { get; }
     }
 
 
@@ -130,11 +130,11 @@ namespace FileWatcher
             }
         }
 
-        public List<string> Folders
+        public IEnumerable<string> Folders
         {
             get
             {
-                return _sourceFolders.Select(sf => sf.Watсher.Folder).ToList();
+                return _sourceFolders.Select(sf => sf.Watсher.Folder);
             }
         }
     }

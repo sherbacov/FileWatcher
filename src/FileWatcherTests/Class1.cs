@@ -11,8 +11,6 @@ using Xunit.Abstractions;
 using Xunit.Ioc.Autofac;
 using Xunit.Sdk;
 
-[assembly: TestFramework("FileWatcherTests.ConfigureTestFramework", "FileWatcherTests")]
-
 
 namespace FileWatcherTests
 {
@@ -40,16 +38,16 @@ namespace FileWatcherTests
     }
 
     [UseAutofacTestFramework]
-    public class SourceFolderTests
+    public class SourceFolderTestsOld
     {
         private ISourceFolderManager _sourceFolderManager;
 
-        public SourceFolderTests()
+        public SourceFolderTestsOld()
         {
             
         }
 
-        public SourceFolderTests(ITestOutputHelper outputHelper)
+        public SourceFolderTestsOld(ITestOutputHelper outputHelper)
         {
             _outputHelper = outputHelper;
            // _sourceFolderManager = sourceFolderManager;

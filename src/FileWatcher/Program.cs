@@ -1,15 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
-using Autofac;
-using Autofac.Configuration;
-using Microsoft.Extensions.Configuration;
-using NLog;
+using System.Reflection;
 using Topshelf;
-using IContainer = Autofac.IContainer;
 
 namespace FileWatcher
 {
-    class Program
+    partial class Program
     {
         static void Main(string[] args)
         {
@@ -31,49 +27,6 @@ namespace FileWatcher
                 x.SetDisplayName("FileWatcher");                   
                 x.SetServiceName("FileWatcher");                   
             });
-        }
-
-        public class FileWatcherManager
-        {
-            private readonly Logger _logger = LogManager.GetCurrentClassLogger();
-            ContainerBuilder _builder;
-
-            IContainer container;
-
-            public void Start()
-            {
-                _builder = new ContainerBuilder();
-
-
-                //_builder.RegisterType<Config>().As<IConfig>();
-                _builder.RegisterType<FileWatcher>().As<IFileWather>();
-                _builder.RegisterType<InternalFileSystemWather>().As<IFileSystemWather>();
-                _builder.RegisterType<SourceFolder>().As<ISourceFolder>().PropertiesAutowired(); ;
-                _builder.RegisterType<SourceFolderManager>().As<ISourceFolderManager>();
-
-
-                // Add the configuration to the ConfigurationBuilder.
-                var configurationBuilder = new ConfigurationBuilder();
-                configurationBuilder.AddXmlFile("FileWatcher.xml");
-
-                // Register the ConfigurationModule with Autofac.
-                var module = new ConfigurationModule(configurationBuilder.Build());
-                _builder.RegisterModule(module);
-               container = _builder.Build();
-
-                var king = container.Resolve<IFileWather>();
-
-                king.StartProcessing();
-                _logger.Info("Запуск успешно завершен.");
-            }
-
-            public void Stop()
-            {
-                _logger.Info("Завершение работы.");
-
-                // clean up, application exits
-                container.Dispose();
-            }
         }
 
     }
