@@ -10,7 +10,7 @@ namespace FileWatcher
             builder.RegisterType<FileWatcher>().As<IFileWather>();
             builder.RegisterType<InternalFileSystemWather>().As<IFileSystemWather>();
             builder.RegisterType<SourceFolder>().As<ISourceFolder>().PropertiesAutowired(); ;
-            builder.RegisterType<SourceFolderManager>().As<ISourceFolderManager>();
+            builder.RegisterType<SourceFolderManager>().As<ISourceFolderManager>().SingleInstance();
         }
     }
 }
