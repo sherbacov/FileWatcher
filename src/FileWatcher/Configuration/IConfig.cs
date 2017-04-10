@@ -15,5 +15,6 @@ namespace FileWatcher.Configuration
         int RetrySec { get; set; }
 
         bool StartBackupThread { get; set; }
+        int BackupThreadTimer { get; set; }
     }
 }

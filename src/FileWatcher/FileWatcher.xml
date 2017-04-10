@@ -11,7 +11,8 @@
       <FileExist>1</FileExist> <!-- режим обработки файлов назначения. см. ниже -->
       <RetrySec>30</RetrySec>
       <WaitSecs>5</WaitSecs> <!-- время ожидания разблокировки исходного файла -->
-      <StartBackupThread>False</StartBackupThread>
+      <StartBackupThread>True</StartBackupThread>
+      <BackupThreadTimer>3000</BackupThreadTimer>
     </properties>
   </components>  
 </autofac>

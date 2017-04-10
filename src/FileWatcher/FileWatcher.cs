@@ -106,7 +106,7 @@ namespace FileWatcher
                         {
                             _log.Error(ex);
                         }
-                        Thread.Sleep(5000);
+                        Thread.Sleep(_config.BackupThreadTimer);
                     }
                 });
                 try

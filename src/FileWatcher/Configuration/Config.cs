@@ -9,5 +9,9 @@ namespace FileWatcher.Configuration
         public int RetrySec { get; set; }
         public FileExistMode FileExist { get; set; }
         public bool StartBackupThread { get; set; }
+        /// <summary>
+        /// Цикл обработки резервного потока
+        /// </summary>
+        public int BackupThreadTimer { get; set; }
     }
 }
