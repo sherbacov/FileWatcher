@@ -8,40 +8,6 @@ using NLog;
 
 namespace FileWatcher
 {
-    /// <summary>
-    /// Внутренний интерфейс обрабатывающий папку
-    /// </summary>
-    public interface IFileSystemWather
-    {
-        string Folder { get; set; }
-        event FileSystemEventHandler NewFile;
-
-    }
-
-    public class InternalFileSystemWather : IFileSystemWather
-    {
-        private FileSystemWatcher _watcher;
-
-        private string _folder;
-
-        public string Folder
-        {
-            get { return _folder; }
-            set
-            {
-                _folder = value;
-                _watcher = new FileSystemWatcher(_folder);
-                _watcher.NotifyFilter = NotifyFilters.LastWrite;
-                _watcher.Filter = "*.*";
-                _watcher.Changed += NewFile;
-                _watcher.EnableRaisingEvents = true;
-            }
-        }
-
-        public event FileSystemEventHandler NewFile;
-    }
-
-
     public class FileWatcher : IFileWather, IDisposable
     {
         private readonly IConfig _config;

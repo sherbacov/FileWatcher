@@ -93,6 +93,8 @@
     <Compile Include="FileWatcherManager.cs" />
     <Compile Include="FileWatcherModule.cs" />
     <Compile Include="Configuration\IConfig.cs" />
+    <Compile Include="Sources\InternalFileSystemWather.cs" />
+    <Compile Include="Sources\IFileSystemWather.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="Sources\ISourceFolder.cs" />
     <Compile Include="Program.cs" />
