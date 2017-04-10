@@ -94,9 +94,10 @@
     <Compile Include="FileWatcherModule.cs" />
     <Compile Include="Configuration\IConfig.cs" />
     <Compile Include="Interfaces.cs" />
+    <Compile Include="Sources\ISourceFolder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SourceFolder.cs" />
+    <Compile Include="Sources\SourceFolderWatсher.cs" />
     <Compile Include="SourceFolderManager.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac;
+using FileWatcher.Sources;
 using NLog;
 
 namespace FileWatcher
 {
     public interface ISourceFolderManager
     {
-        void Process(string src, FileSystemEventHandler handler);
+        void Configure(string src, FileSystemEventHandler handler);
         IEnumerable<string> Folders { get; }
 
         void SearchFiles();
@@ -28,7 +29,7 @@ namespace FileWatcher
 
         private FileSystemEventHandler _handler;
 
-        public void Process(string src, FileSystemEventHandler handler)
+        public void Configure(string src, FileSystemEventHandler handler)
         {
             _sourceFolders.Clear();
             _handler = handler;
@@ -37,7 +38,7 @@ namespace FileWatcher
             {
                 _log.Debug("Ïàïêà èñòî÷íèê: {0}", folder);
                 var sf = _container.Resolve<ISourceFolder>();
-                sf.Watñher.NewFile += handler;
+                sf.Handler += handler;
                 sf.Folder = folder;
                 _sourceFolders.Add(sf);
             }
@@ -66,7 +67,7 @@ namespace FileWatcher
         {
             get
             {
-                return _sourceFolders.Select(sf => sf.Watñher.Folder);
+                return _sourceFolders.Select(sf => sf.Folder);
             }
         }
     }

@@ -1,5 +1,6 @@
 using Autofac;
 using FileWatcher.Configuration;
+using FileWatcher.Sources;
 
 namespace FileWatcher
 {
@@ -10,7 +11,7 @@ namespace FileWatcher
             builder.RegisterType<Config>().As<IConfig>();
             builder.RegisterType<FileWatcher>().As<IFileWather>();
             builder.RegisterType<InternalFileSystemWather>().As<IFileSystemWather>();
-            builder.RegisterType<SourceFolder>().As<ISourceFolder>().PropertiesAutowired(); ;
+            builder.RegisterType<SourceFolderWatñher>().As<ISourceFolder>().PropertiesAutowired(); ;
             builder.RegisterType<SourceFolderManager>().As<ISourceFolderManager>().SingleInstance();
         }
     }

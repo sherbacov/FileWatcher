@@ -23,7 +23,7 @@ namespace FileWatcherTests
         {
             var sourceFolderManager = container.Resolve<ISourceFolderManager>();
 
-            var srcDist = SourceFoldes.ToList();
+            var srcDist = SourceFoldesTest.ToList();
 
             sourceFolderManager.Folders.ToList().ForEach(f =>
             {
@@ -42,7 +42,7 @@ namespace FileWatcherTests
         /// <summary>
         /// Список тестовых папок
         /// </summary>
-        protected List<string> SourceFoldes { get; set; }
+        protected List<string> SourceFoldesTest { get; set; }
 
         public FileWatcherTest()
         {
@@ -70,7 +70,7 @@ namespace FileWatcherTests
             var src1 = Path.Combine(codeBasePath, "src");
             var src2 = Path.Combine(codeBasePath, "src2");
 
-            SourceFoldes = new List<string>{src1, src2};
+            SourceFoldesTest = new List<string>{src1, src2};
 
             var dst1 = Path.Combine(codeBasePath, "dst");
             var dst2 = Path.Combine(codeBasePath, "dst2");
@@ -90,9 +90,9 @@ namespace FileWatcherTests
 
             container = _builder.Build();
 
-            var cnf = container.Resolve<IConfig>();
+            //var cnf = container.Resolve<IConfig>();
 
-            var king = container.Resolve<IFileWather>();
+            //var king = container.Resolve<IFileWather>();
 
 
             // ... initialize data in the test database ...

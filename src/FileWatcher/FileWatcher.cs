@@ -53,7 +53,7 @@ namespace FileWatcher
             _config = config;
             _sourceFolderManager = sourceFolderManager;
 
-            sourceFolderManager.Process(config.SourceFolder, WatcherOnChanged);
+            sourceFolderManager.Configure(config.SourceFolder, WatcherOnChanged);
 
             _destFolders = new List<string>();
             foreach (var dstfolder in config.DestFolder.Split(';'))
@@ -66,7 +66,7 @@ namespace FileWatcher
         private readonly List<string> _destFolders;
 
         private bool _stopBackupThead;
-        private Thread backupThread;
+        private Thread _backupThread;
 
         private bool _firstStart = true;
 
@@ -80,7 +80,7 @@ namespace FileWatcher
 
             if (_config.StartBackupThread)
             {
-                backupThread = new Thread(o =>
+                _backupThread = new Thread(o =>
                 {
                     _log.Info("Запуск резервного потока.");
                     while (true)
@@ -98,7 +98,7 @@ namespace FileWatcher
                                 foreach (var file in new DirectoryInfo(sourceFolder).GetFiles("*.*"))
                                 {
                                     _log.Debug("Передача файла из резервного потока: {0}", file.Name);
-                                    WatcherOnChanged((object) this, new FileSystemEventArgs(WatcherChangeTypes.Changed, file.Directory.FullName, file.Name));
+                                    WatcherOnChanged(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, file.Directory.FullName, file.Name));
                                 }
                             }
                         }
@@ -111,7 +111,7 @@ namespace FileWatcher
                 });
                 try
                 {
-                    backupThread.Start();
+                    _backupThread.Start();
                 }
                 catch (Exception ex)
                 {
@@ -223,10 +223,10 @@ namespace FileWatcher
 
         public void Dispose()
         {
-            if (backupThread != null)
+            if (_backupThread != null)
             {
                 _stopBackupThead = true;
-                backupThread.Join();
+                _backupThread.Join();
             }
         }
     }
