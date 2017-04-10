@@ -1,4 +1,5 @@
 using Autofac;
+using FileWatcher.Configuration;
 
 namespace FileWatcher
 {

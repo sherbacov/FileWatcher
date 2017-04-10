@@ -1,4 +1,4 @@
-namespace FileWatcher
+namespace FileWatcher.Configuration
 {
     public interface IConfig
     {

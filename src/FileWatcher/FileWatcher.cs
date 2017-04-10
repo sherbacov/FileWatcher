@@ -3,50 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Autofac;
+using FileWatcher.Configuration;
 using NLog;
 
 namespace FileWatcher
 {
-    public class Config : IConfig
-    {
-        public string SourceFolder { get; set; }
-        public string DestFolder { get; set; }
-        public ErrorMode Mode { get; set; }
-        public int WaitSecs { get; set; }
-        public int RetrySec { get; set; }
-        public FileExistMode FileExist { get; set; }
-        public bool StartBackupThread { get; set; }
-    }
-
-    public enum ErrorMode
-    {
-        /// <summary>
-        /// Ошибка, прерывать обработку
-        /// </summary>
-        Error = 1,
-        /// <summary>
-        /// Продолжать копирование при наличии ошибки.
-        /// </summary>
-        Continue = 2,
-        /// <summary>
-        /// Ожидать RetrySec и поторить попытку. 
-        /// </summary>
-        WaitAndRetry = 3
-    }
-
-    public enum FileExistMode
-    {
-        /// <summary>
-        /// Перезаписывать файл
-        /// </summary>
-        Override = 1,
-        /// <summary>
-        /// Пропускать файл из источника
-        /// </summary>
-        Ignore = 2
-    }
-
     /// <summary>
     /// Внутренний интерфейс обрабатывающий папку
     /// </summary>
@@ -81,65 +42,6 @@ namespace FileWatcher
     }
 
 
-    public class SourceFolder : ISourceFolder
-    {
-        public SourceFolder(IFileSystemWather watсher)
-        {
-            Watсher = watсher;
-        }
-        public IFileSystemWather Watсher { get; set; }
-    }
-
-
-    public interface ISourceFolder
-    {
-        IFileSystemWather Watсher { get; set; }
-    }
-
-
-    public interface ISourceFolderManager
-    {
-        void Process(string src, FileSystemEventHandler handler);
-        IEnumerable<string> Folders { get; }
-    }
-
-
-    public class SourceFolderManager : ISourceFolderManager
-    {
-        public SourceFolderManager(ILifetimeScope container)
-        {
-            _container = container;
-        }
-
-        private readonly List<ISourceFolder> _sourceFolders = new List<ISourceFolder>();
-
-        private readonly Logger _log = LogManager.GetCurrentClassLogger();
-        private readonly ILifetimeScope _container;
-
-        public void Process(string src, FileSystemEventHandler handler)
-        {
-            _sourceFolders.Clear();
-
-            foreach (var folder in src.Split(';'))
-            {
-                _log.Debug("Папка источник: {0}", folder);
-                var sf = _container.Resolve<ISourceFolder>();
-                sf.Watсher.NewFile += handler;
-                sf.Watсher.Folder = folder;
-                _sourceFolders.Add(sf);
-            }
-        }
-
-        public IEnumerable<string> Folders
-        {
-            get
-            {
-                return _sourceFolders.Select(sf => sf.Watсher.Folder);
-            }
-        }
-    }
-
-
     public class FileWatcher : IFileWather, IDisposable
     {
         private readonly IConfig _config;
@@ -166,8 +68,16 @@ namespace FileWatcher
         private bool _stopBackupThead;
         private Thread backupThread;
 
+        private bool _firstStart = true;
+
         public void StartProcessing()
         {
+            if (_firstStart)
+            {
+                _sourceFolderManager.SearchFiles();
+                _firstStart = false;
+            }
+
             if (_config.StartBackupThread)
             {
                 backupThread = new Thread(o =>

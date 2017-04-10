@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using FileWatcher;
+using FileWatcher.Configuration;
 using Xunit;
 
 namespace FileWatcherTests
@@ -14,23 +15,34 @@ namespace FileWatcherTests
     public class SourceFolderTests : FileWatcherTest
     {
 
-
-        public SourceFolderTests()
-        {
-
-        }
-
+        /// <summary>
+        /// Проверяем корректное заполнение источников
+        /// </summary>
         [Fact]
         public void SourceFolderList()
         {
-            var sourceList = container.Resolve<ISourceFolderManager>();
-            Assert.True(sourceList.Folders.Distinct().Count() == 2, "Количество папок источников с ошибкой");
+            var sourceFolderManager = container.Resolve<ISourceFolderManager>();
+
+            var srcDist = SourceFoldes.ToList();
+
+            sourceFolderManager.Folders.ToList().ForEach(f =>
+            {
+                if (srcDist.Contains(f))
+                    srcDist.Remove(f);
+            });
+
+            Assert.True(!srcDist.Any(), "Заполнены не все источники.");
         }
     }
 
     public class FileWatcherTest : IDisposable
     {
         protected IContainer container;
+
+        /// <summary>
+        /// Список тестовых папок
+        /// </summary>
+        protected List<string> SourceFoldes { get; set; }
 
         public FileWatcherTest()
         {
@@ -48,7 +60,6 @@ namespace FileWatcherTests
 
             var codeBaseUrl = new Uri(Assembly.GetExecutingAssembly().CodeBase);
             var codeBasePath = Uri.UnescapeDataString(codeBaseUrl.AbsolutePath);
-            var dirPath = Path.GetDirectoryName(codeBasePath);
 
             codeBasePath = $"{codeBasePath}.Test";
 
@@ -58,6 +69,9 @@ namespace FileWatcherTests
             // Создаем тестовые папки
             var src1 = Path.Combine(codeBasePath, "src");
             var src2 = Path.Combine(codeBasePath, "src2");
+
+            SourceFoldes = new List<string>{src1, src2};
+
             var dst1 = Path.Combine(codeBasePath, "dst");
             var dst2 = Path.Combine(codeBasePath, "dst2");
 
@@ -84,10 +98,10 @@ namespace FileWatcherTests
             // ... initialize data in the test database ...
         }
 
-        private static void CreateFolder(string src1)
+        private static void CreateFolder(string folder)
         {
-            if (!Directory.Exists(src1))
-                Directory.CreateDirectory(src1);
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
         }
 
         public void Dispose()
